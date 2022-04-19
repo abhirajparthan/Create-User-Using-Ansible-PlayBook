@@ -1,0 +1,25 @@
+
+---
+
+- name: "User Creation"
+  become: true
+  hosts: amazon
+  tasks:
+
+    - name: "New User Add Remote Server"
+      ansible.builtin.user:
+        name: abhiraj
+        comment: Devops-Enginner
+        uid: 10143
+        group: ec2-user
+        createhome: yes
+        home: /home/abhiraj
+        shell: /bin/bash
+        password: "{{ newpassword|password_hash('sha512') }}"
+  
+    - name: "Public key moving to new user"
+      copy:
+       src: "./.ssh/"
+       dest: "/home/abhiraj/.ssh/"
+       
+
