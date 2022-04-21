@@ -8,19 +8,59 @@ Ansible is an open-source software provisioning, configuration management, and a
 ------
 ### Prerequisites
 
-1. 2 Instance needed, 1 for Ansible configuration and the other 1 for remote server configuration
-2. Install and configure Ansible in the main Instance and set up the inventry file remore ( client ) server.
-3. Test the Inventry file ( remote servers ) using the ping commant.
+1. 2 Instance needed, 1 for Ansible Manager node and the other 1 for client node
+2. Install and configure Ansible in the Manager node and set up the inventry file for client node in the Manager server .
+3. Test the Inventry file ( client node ) using the ping commant.
 
 
 -----
-### Create User with Password using Ansible Playbook
+### Installing ansible on manager node.
 
-Setup your playbook as followed. I have created a directory in the main instance called "create-user" and created a YML file inside the directory.  Here my YML file is user-creation.yml.
+You can use the below command to install the Ansible in the Manager node.
+~~~
+sudo amazon-linux-extras install ansible2 -y
+~~~
+
+Once the installation completed. Please check the version throught the below command. 
+~~~
+ansible --version
+
+ansible 2.9.23
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = [u'/home/ec2-user/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.18 (default, Jun 10 2021, 00:11:02) [GCC 7.3.1 20180712 (Red Hat 7.3.1-13)]
+~~~
+
+-----
+### Adding client node in hosts of manager node
+
+ Here I have created a working directory in the main instance ( Managed node ) called "create-user" and I have created a file "hosts" under the create-user directory.
 
 ~~~
 mkdir create-user && cd create-user
 
+touch hosts
+~~~
+
+Then I have added the client node detailsin the hosts ( invetry ) file. The details are username, port number, keyfile and IP address. The dtails are added to below sniiptthis. 
+
+~~~
+[amazon]                                                                                        
+<server IP> ansible_user="ec2-user" ansible_port=22 ansible_ssh_private_key_file="abhira.pem"
+~~~
+
+Abhiraj.pem is the private key that im using for accessing the client node. [amazon] is the group name i have given to the client nodes.
+
+Note: please hold the pem and hosts file in the working directory. my working directory is create-user
+
+-------
+### Create User with Password using Ansible Playbook
+
+Setup your playbook as followed. I have created created a YML file inside the working directory.  Here my YML file is user-creation.yml.
+
+~~~
 vi user-creation.yml
 ~~~
 
@@ -48,7 +88,7 @@ Then copy-paste the below content into the YML  file.
   
     - name: "Public key copy to new user"
       copy:
-       src: "./.ssh/"
+       src: "../.ssh/"
        dest: "/home/abhiraj/.ssh/"
 ~~~
 
@@ -64,7 +104,7 @@ Let's cover that task definition:
 8. password: Settup encripted password for user
 
 
-Here I am using the AWS EC2 instance and I have a PEM file for the ec2-user. The ec2-user PEM file is copied to the new user directory for login with the same key from the outside to the server as the new username "abhiraj". Also, I have set up the password for the new user. The password is used to log in to the user inside the instance, The pasword login not enabled in the server, so the password login didn't work from the outside.
+Here I am using the AWS EC2 instance and I have a PEM file for the ec2-user. The ec2-user PEM file is copied to the new user directory for login with the same key from the server outside as the new username "abhiraj". Also, I have set up the password for the new user. The password is used to log in to the user inside the instance, The pasword login not enabled in the server, so the password login didn't work from the outside.
 
 Run the command first as below for the playbook syntax check. I have attached the output screenshot for reference. 
 
@@ -83,8 +123,8 @@ To run this playbook, run the command below. This will input the user password v
 ansible-playbook -i hosts  user-creation.yml --extra-vars userpassword=qwerty123!
 ~~~
 
-
-Next, Check the user creation and logins are working or not.
+-----
+### Check the user creation and user logins 
 
 Please login to the remote server ( client server ) with the ec2-user key ( pem ) file.  I have attached the screenshot for the reference.
 
