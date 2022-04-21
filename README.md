@@ -48,10 +48,10 @@ Then I have added the client node detailsin the hosts ( invetry ) file. The deta
 
 ~~~
 [amazon]                                                                                        
-<server IP> ansible_user="ec2-user" ansible_port=22 ansible_ssh_private_key_file="abhira.pem"
+<server IP> ansible_user="ec2-user" ansible_port=22 ansible_ssh_private_key_file="abhiswarm.pem"
 ~~~
 
-Abhiraj.pem is the private key that im using for accessing the client node. [amazon] is the group name i have given to the client nodes.
+abhiswarm.pem is the private key that im using for accessing the client node. [amazon] is the group name i have given to the client nodes.
 
 Note: please hold the pem and hosts file in the working directory. my working directory is create-user
 
